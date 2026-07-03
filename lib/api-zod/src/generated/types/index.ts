@@ -13,6 +13,8 @@ export * from './guruScores';
 export * from './healthStatus';
 export * from './marketData';
 export * from './newsItem';
+export * from './screenerList';
+export * from './screenerStock';
 export * from './searchStocksParams';
 export * from './stockDetail';
 export * from './stockSearchResult';

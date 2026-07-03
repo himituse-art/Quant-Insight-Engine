@@ -81,12 +81,15 @@ export interface QuoteSummaryResult {
     trailingPE?: number;
     forwardPE?: number;
     trailingAnnualDividendYield?: number;
+    dividendYield?: number;
+    beta?: number;
   };
   defaultKeyStatistics?: {
     pegRatio?: number;
     trailingEps?: number;
     forwardEps?: number;
     enterpriseValue?: number;
+    beta?: number;
   };
   financialData?: {
     returnOnEquity?: number;
@@ -99,6 +102,7 @@ export interface QuoteSummaryResult {
     revenueGrowth?: number;
     targetMedianPrice?: number;
     debtToEquity?: number;
+    totalRevenue?: number;
   };
   assetProfile?: {
     sector?: string;
@@ -167,11 +171,17 @@ export async function getQuoteSummary(
           marketCap: num(summaryDetail.marketCap),
           trailingPE: num(summaryDetail.trailingPE),
           forwardPE: num(summaryDetail.forwardPE),
+          trailingAnnualDividendYield: num(
+            summaryDetail.trailingAnnualDividendYield,
+          ),
+          dividendYield: num(summaryDetail.dividendYield),
+          beta: num(summaryDetail.beta),
         },
         defaultKeyStatistics: {
           pegRatio: num(keyStats.pegRatio),
           trailingEps: num(keyStats.trailingEps),
           forwardEps: num(keyStats.forwardEps),
+          beta: num(keyStats.beta),
         },
         financialData: {
           returnOnEquity: num(financialData.returnOnEquity),
@@ -182,6 +192,7 @@ export async function getQuoteSummary(
           earningsGrowth: num(financialData.earningsGrowth),
           revenueGrowth: num(financialData.revenueGrowth),
           debtToEquity: num(financialData.debtToEquity),
+          totalRevenue: num(financialData.totalRevenue),
         },
         assetProfile: {
           sector: str(assetProfile.sector),

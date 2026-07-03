@@ -12,6 +12,8 @@ tags:
     description: Health operations
   - name: stocks
     description: Stock quant data operations
+  - name: screeners
+    description: Thematic Top 10 stock screener operations
 paths:
   /healthz:
     get:
@@ -80,6 +82,20 @@ paths:
                 $ref: "#/components/schemas/StockDetail"
         "404":
           description: Ticker not found
+  /screeners:
+    get:
+      operationId: getScreeners
+      tags: [screeners]
+      summary: Get the 5 thematic Top 10 stock screener leaderboards
+      responses:
+        "200":
+          description: Screener leaderboards
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ScreenerList"
 components:
   schemas:
     HealthStatus:
@@ -252,4 +268,25 @@ components:
             $ref: "#/components/schemas/NewsItem"
         financialLinks: { $ref: "#/components/schemas/FinancialLinks" }
         experimentalScores: { $ref: "#/components/schemas/ExperimentalScores" }
+    ScreenerStock:
+      type: object
+      required: [symbol, name, price, metricLabel, metricValue, rank]
+      properties:
+        symbol: { type: string }
+        name: { type: string }
+        price: { type: ["number", "null"] }
+        metricLabel: { type: string }
+        metricValue: { type: ["number", "null"] }
+        rank: { type: integer }
+    ScreenerList:
+      type: object
+      required: [key, title, description, stocks]
+      properties:
+        key: { type: string }
+        title: { type: string }
+        description: { type: string }
+        stocks:
+          type: array
+          items:
+            $ref: "#/components/schemas/ScreenerStock"
 

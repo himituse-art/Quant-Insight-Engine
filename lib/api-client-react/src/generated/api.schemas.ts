@@ -139,6 +139,24 @@ export interface StockDetail {
   experimentalScores: ExperimentalScores;
 }
 
+export interface ScreenerStock {
+  symbol: string;
+  name: string;
+  /** @nullable */
+  price: number | null;
+  metricLabel: string;
+  /** @nullable */
+  metricValue: number | null;
+  rank: number;
+}
+
+export interface ScreenerList {
+  key: string;
+  title: string;
+  description: string;
+  stocks: ScreenerStock[];
+}
+
 export type SearchStocksParams = {
 q: string;
 };

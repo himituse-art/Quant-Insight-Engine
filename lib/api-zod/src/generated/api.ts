@@ -123,3 +123,22 @@ export const GetStockDetailResponse = zod.object({
 })
 
 
+/**
+ * @summary Get the 5 thematic Top 10 stock screener leaderboards
+ */
+export const GetScreenersResponseItem = zod.object({
+  "key": zod.string(),
+  "title": zod.string(),
+  "description": zod.string(),
+  "stocks": zod.array(zod.object({
+  "symbol": zod.string(),
+  "name": zod.string(),
+  "price": zod.number().nullable(),
+  "metricLabel": zod.string(),
+  "metricValue": zod.number().nullable(),
+  "rank": zod.number()
+}))
+})
+export const GetScreenersResponse = zod.array(GetScreenersResponseItem)
+
+

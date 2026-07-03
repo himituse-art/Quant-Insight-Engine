@@ -1,0 +1,27 @@
+1. Undervalued Top 10 (High Margin of Safety):
+- Pre-filters: Market Cap > $5B AND ROE (TTM) > 12%. 
+- Algorithm: Implement a standard 5-Year DCF model (Discount Rate WACC = 9%, Terminal Growth Rate = 2.5%) to calculate the Fair Value per share. Margin of Safety (MoS) = (Fair Value - Current Close Price) / Fair Value. 
+- Scoring: Final Value Score = (MoS * 100 * 0.7) + ((1 - 5Y PE Percentile) * 100 * 0.3). Sort descending and pick the Top 10.
+
+2. Best to Buy Now Top 10 (Guru & Momentum Consensus):
+- Pre-filters: Buffett Score > 80 AND Peter Lynch Score > 80 AND Current Price > 50MA. 
+- Algorithm: Calculate Technical Momentum Score. Base score of 80 points if a bullish alignment is met (Price > 20MA > 50MA > 200MA). Adjust by adding +20 points if RSI(14) is between 35 and 60, or subtracting -40 points if RSI > 75. 
+- Scoring: Final Score = (Average of Guru Scores * 0.5) + (Technical Momentum Score * 0.5). Sort descending and pick the Top 10.
+
+3. 3-Year Highest Return Top 10 (Growth Momentum):
+- Pre-filters: 3-Year Revenue and Net Income CAGR must be positive, AND PEG < 1.2. 
+- Algorithm: Using Wall Street analyst consensus data, calculate Estimated 3-Year Target Price = 2029 Expected EPS * min(Current PE, 5Y Average PE). 
+- Scoring: Compute the Expected Compound Annual Growth Rate: CAGR = (Target Price / Current Price)^(1/3) - 1. Sort by CAGR descending and pick the Top 10.
+
+4. AI Beneficiary Top 10 (NLP Keyword Matcher):
+- Algorithm: Scan the stock's latest news, filings, or description texts for AI keywords ("Artificial Intelligence", "AI", "LLM", "Data Center", "Generative AI") to get the word frequency count (C_AI). 
+- Scoring: Final AI Beneficiary Score = (C_AI * 0.4) + ((R&D Expense / Total Revenue) * 100 * 0.4) + (YoY Revenue Growth % * 100 * 0.2). Sort descending and pick the Top 10.
+
+5. Defensive Top 10 (Low Volatility / Safe Haven):
+- Pre-filters: Beta (5Y Monthly) < 0.75 AND Debt-to-Equity Ratio < 1.0. 
+- Scoring: Final Defensive Score = ((1 - Beta) * 40) + (min(Dividend Yield / 0.08, 1) * 30) + (min(FCF Margin / 0.3, 1) * 30). Sort descending and pick the Top 10.
+
+Backend & Frontend Infrastructure Requirements:
+- Create a `/api/screeners` endpoint in FastAPI to output these 5 screener lists in JSON format. 
+- Rate Limit Protection: To prevent yfinance from hitting rate limits or blocking requests, hardcode a predefined mock "Stock Universe" containing 50-100 major US mega-cap tickers across different sectors to act as the processing database.
+- UI Design: Use React and Tailwind CSS to build 5 sleek leaderboard columns side-by-side on the homepage dashboard. Each column should represent a category, displaying Ticker, Company Name, Current Price, and its primary ranking metric. Clicking a stock should link to its dedicated detailed view.

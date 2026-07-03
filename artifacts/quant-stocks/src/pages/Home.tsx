@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDebounce } from "@/hooks/use-debounce";
 import { Badge } from "@/components/ui/badge";
+import { ScreenerBoard } from "@/components/ScreenerBoard";
 
 export default function Home() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -20,7 +21,7 @@ export default function Home() {
   const { data: popularStocks, isLoading: isPopularLoading } = useGetPopularStocks();
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-12 space-y-12">
+    <div className="max-w-7xl mx-auto px-4 py-12 space-y-12">
       <div className="text-center space-y-4">
         <h1 className="text-4xl md:text-5xl font-serif font-bold tracking-tight">
           Professional Grade Equity Analysis
@@ -123,6 +124,8 @@ export default function Home() {
           </div>
         )}
       </div>
+
+      <ScreenerBoard />
     </div>
   );
 }

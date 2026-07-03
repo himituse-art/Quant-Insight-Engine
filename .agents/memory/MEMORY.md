@@ -1,1 +1,2 @@
 - [Yahoo Finance API crumb auth](yahoo-finance-crumb-auth.md) — quoteSummary endpoint needs a session cookie + crumb token, not just a User-Agent header.
+- [Stock screener data proxies](stock-screener-data-proxies.md) — free Yahoo endpoints lack 5Y PE history, 3Y CAGR, R&D expense, so screeners use cross-sectional/margin proxies instead.

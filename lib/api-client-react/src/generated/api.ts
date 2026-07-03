@@ -17,6 +17,7 @@ import type {
 
 import type {
   HealthStatus,
+  ScreenerList,
   SearchStocksParams,
   StockDetail,
   StockSearchResult
@@ -353,6 +354,83 @@ export function useGetStockDetail<TData = Awaited<ReturnType<typeof getStockDeta
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getGetStockDetailQueryOptions(ticker,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetScreenersUrl = () => {
+
+
+
+
+  return `/api/screeners`
+}
+
+/**
+ * @summary Get the 5 thematic Top 10 stock screener leaderboards
+ */
+export const getScreeners = async ( options?: RequestInit): Promise<ScreenerList[]> => {
+
+  return customFetch<ScreenerList[]>(getGetScreenersUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetScreenersQueryKey = () => {
+    return [
+    `/api/screeners`
+    ] as const;
+    }
+
+
+export const getGetScreenersQueryOptions = <TData = Awaited<ReturnType<typeof getScreeners>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getScreeners>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetScreenersQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getScreeners>>> = ({ signal }) => getScreeners({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getScreeners>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetScreenersQueryResult = NonNullable<Awaited<ReturnType<typeof getScreeners>>>
+export type GetScreenersQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get the 5 thematic Top 10 stock screener leaderboards
+ */
+
+export function useGetScreeners<TData = Awaited<ReturnType<typeof getScreeners>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getScreeners>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetScreenersQueryOptions(options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 
