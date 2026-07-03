@@ -16,7 +16,10 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AiCommitteeVerdict,
+  FundFlow,
   HealthStatus,
+  HistoricalValuation,
   ScreenerList,
   SearchStocksParams,
   StockDetail,
@@ -354,6 +357,237 @@ export function useGetStockDetail<TData = Awaited<ReturnType<typeof getStockDeta
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getGetStockDetailQueryOptions(ticker,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetHistoricalValuationUrl = (ticker: string,) => {
+
+
+
+
+  return `/api/stocks/${ticker}/historical-valuation`
+}
+
+/**
+ * @summary Get historical PE/PB valuation bands for a ticker
+ */
+export const getHistoricalValuation = async (ticker: string, options?: RequestInit): Promise<HistoricalValuation> => {
+
+  return customFetch<HistoricalValuation>(getGetHistoricalValuationUrl(ticker),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetHistoricalValuationQueryKey = (ticker: string,) => {
+    return [
+    `/api/stocks/${ticker}/historical-valuation`
+    ] as const;
+    }
+
+
+export const getGetHistoricalValuationQueryOptions = <TData = Awaited<ReturnType<typeof getHistoricalValuation>>, TError = ErrorType<void>>(ticker: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getHistoricalValuation>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetHistoricalValuationQueryKey(ticker);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getHistoricalValuation>>> = ({ signal }) => getHistoricalValuation(ticker, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: ticker !== null && ticker !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getHistoricalValuation>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetHistoricalValuationQueryResult = NonNullable<Awaited<ReturnType<typeof getHistoricalValuation>>>
+export type GetHistoricalValuationQueryError = ErrorType<void>
+
+
+/**
+ * @summary Get historical PE/PB valuation bands for a ticker
+ */
+
+export function useGetHistoricalValuation<TData = Awaited<ReturnType<typeof getHistoricalValuation>>, TError = ErrorType<void>>(
+ ticker: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getHistoricalValuation>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetHistoricalValuationQueryOptions(ticker,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetAiCommitteeVerdictUrl = (ticker: string,) => {
+
+
+
+
+  return `/api/stocks/${ticker}/ai-committee`
+}
+
+/**
+ * @summary Get the AI Investment Committee verdict for a ticker
+ */
+export const getAiCommitteeVerdict = async (ticker: string, options?: RequestInit): Promise<AiCommitteeVerdict> => {
+
+  return customFetch<AiCommitteeVerdict>(getGetAiCommitteeVerdictUrl(ticker),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAiCommitteeVerdictQueryKey = (ticker: string,) => {
+    return [
+    `/api/stocks/${ticker}/ai-committee`
+    ] as const;
+    }
+
+
+export const getGetAiCommitteeVerdictQueryOptions = <TData = Awaited<ReturnType<typeof getAiCommitteeVerdict>>, TError = ErrorType<void>>(ticker: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAiCommitteeVerdict>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAiCommitteeVerdictQueryKey(ticker);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAiCommitteeVerdict>>> = ({ signal }) => getAiCommitteeVerdict(ticker, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: ticker !== null && ticker !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAiCommitteeVerdict>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetAiCommitteeVerdictQueryResult = NonNullable<Awaited<ReturnType<typeof getAiCommitteeVerdict>>>
+export type GetAiCommitteeVerdictQueryError = ErrorType<void>
+
+
+/**
+ * @summary Get the AI Investment Committee verdict for a ticker
+ */
+
+export function useGetAiCommitteeVerdict<TData = Awaited<ReturnType<typeof getAiCommitteeVerdict>>, TError = ErrorType<void>>(
+ ticker: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAiCommitteeVerdict>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetAiCommitteeVerdictQueryOptions(ticker,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetFundFlowUrl = (ticker: string,) => {
+
+
+
+
+  return `/api/stocks/${ticker}/fund-flow`
+}
+
+/**
+ * @summary Get institutional ownership and volume shock data for a ticker
+ */
+export const getFundFlow = async (ticker: string, options?: RequestInit): Promise<FundFlow> => {
+
+  return customFetch<FundFlow>(getGetFundFlowUrl(ticker),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetFundFlowQueryKey = (ticker: string,) => {
+    return [
+    `/api/stocks/${ticker}/fund-flow`
+    ] as const;
+    }
+
+
+export const getGetFundFlowQueryOptions = <TData = Awaited<ReturnType<typeof getFundFlow>>, TError = ErrorType<void>>(ticker: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getFundFlow>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetFundFlowQueryKey(ticker);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getFundFlow>>> = ({ signal }) => getFundFlow(ticker, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: ticker !== null && ticker !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getFundFlow>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetFundFlowQueryResult = NonNullable<Awaited<ReturnType<typeof getFundFlow>>>
+export type GetFundFlowQueryError = ErrorType<void>
+
+
+/**
+ * @summary Get institutional ownership and volume shock data for a ticker
+ */
+
+export function useGetFundFlow<TData = Awaited<ReturnType<typeof getFundFlow>>, TError = ErrorType<void>>(
+ ticker: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getFundFlow>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetFundFlowQueryOptions(ticker,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

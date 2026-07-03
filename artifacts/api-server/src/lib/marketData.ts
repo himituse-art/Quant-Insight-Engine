@@ -83,6 +83,9 @@ export interface QuoteSummaryResult {
     trailingAnnualDividendYield?: number;
     dividendYield?: number;
     beta?: number;
+    volume?: number;
+    averageVolume?: number;
+    averageDailyVolume10Day?: number;
   };
   defaultKeyStatistics?: {
     pegRatio?: number;
@@ -90,6 +93,7 @@ export interface QuoteSummaryResult {
     forwardEps?: number;
     enterpriseValue?: number;
     beta?: number;
+    bookValue?: number;
   };
   financialData?: {
     returnOnEquity?: number;
@@ -176,12 +180,16 @@ export async function getQuoteSummary(
           ),
           dividendYield: num(summaryDetail.dividendYield),
           beta: num(summaryDetail.beta),
+          volume: num(summaryDetail.volume),
+          averageVolume: num(summaryDetail.averageVolume),
+          averageDailyVolume10Day: num(summaryDetail.averageDailyVolume10Day),
         },
         defaultKeyStatistics: {
           pegRatio: num(keyStats.pegRatio),
           trailingEps: num(keyStats.trailingEps),
           forwardEps: num(keyStats.forwardEps),
           beta: num(keyStats.beta),
+          bookValue: num(keyStats.bookValue),
         },
         financialData: {
           returnOnEquity: num(financialData.returnOnEquity),
@@ -244,6 +252,132 @@ export async function getChartHistory(
       return { closes, timestamps };
     } catch (err) {
       logger.warn({ err, ticker }, "Failed to fetch Yahoo chart history");
+      return null;
+    }
+  });
+}
+
+const LONG_CHART_CACHE_TTL_MS = 60 * 60_000;
+
+export async function getLongChartHistory(
+  ticker: string,
+): Promise<ChartResult | null> {
+  const hit = longChartCache.get(ticker);
+  if (hit && hit.expiresAt > Date.now()) {
+    return hit.value;
+  }
+  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(
+    ticker,
+  )}?range=10y&interval=1wk`;
+  try {
+    const json = (await fetchJson(url)) as {
+      chart?: { result?: unknown[]; error?: unknown };
+    };
+    const result = json.chart?.result?.[0] as
+      | {
+          timestamp?: number[];
+          indicators?: { quote?: { close?: (number | null)[] }[] };
+        }
+      | undefined;
+    if (!result?.timestamp) return null;
+
+    const closesRaw = result.indicators?.quote?.[0]?.close ?? [];
+    const timestamps: number[] = [];
+    const closes: number[] = [];
+    for (let i = 0; i < result.timestamp.length; i++) {
+      const close = closesRaw[i];
+      if (typeof close === "number") {
+        timestamps.push(result.timestamp[i]);
+        closes.push(close);
+      }
+    }
+    if (closes.length === 0) return null;
+    const value = { closes, timestamps };
+    longChartCache.set(ticker, {
+      expiresAt: Date.now() + LONG_CHART_CACHE_TTL_MS,
+      value,
+    });
+    return value;
+  } catch (err) {
+    logger.warn({ err, ticker }, "Failed to fetch Yahoo long-range chart");
+    return null;
+  }
+}
+
+const longChartCache = new Map<
+  string,
+  { expiresAt: number; value: ChartResult }
+>();
+
+export interface OwnershipHolder {
+  organization: string;
+  pctHeld?: number;
+  shares?: number;
+  value?: number;
+  pctChange?: number;
+}
+
+export interface OwnershipData {
+  institutionsPercentHeld?: number;
+  institutionsCount?: number;
+  insidersPercentHeld?: number;
+  topInstitutionalHolders: OwnershipHolder[];
+  topFundHolders: OwnershipHolder[];
+}
+
+export async function getOwnershipData(
+  ticker: string,
+): Promise<OwnershipData | null> {
+  return cached(`ownership:${ticker}`, async () => {
+    const modules = [
+      "institutionOwnership",
+      "fundOwnership",
+      "majorHoldersBreakdown",
+    ].join(",");
+    const url = `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${encodeURIComponent(
+      ticker,
+    )}?modules=${modules}`;
+    try {
+      const json = (await fetchJson(url, { authenticated: true })) as {
+        quoteSummary?: { result?: unknown[]; error?: unknown };
+      };
+      const result = json.quoteSummary?.result?.[0] as
+        | Record<string, Record<string, unknown>>
+        | undefined;
+      if (!result) return null;
+
+      const breakdown = result.majorHoldersBreakdown ?? {};
+      const institutionOwnership = result.institutionOwnership as
+        | { ownershipList?: unknown[] }
+        | undefined;
+      const fundOwnership = result.fundOwnership as
+        | { ownershipList?: unknown[] }
+        | undefined;
+
+      const mapHolder = (entry: unknown): OwnershipHolder => {
+        const e = entry as Record<string, unknown>;
+        return {
+          organization: str(e.organization) ?? "Unknown",
+          pctHeld: num(e.pctHeld),
+          shares: num(e.position),
+          value: num(e.value),
+          pctChange: num(e.pctChange),
+        };
+      };
+
+      return {
+        institutionsPercentHeld: num(breakdown.institutionsPercentHeld),
+        institutionsCount: num(breakdown.institutionsCount),
+        insidersPercentHeld: num(breakdown.insidersPercentHeld),
+        topInstitutionalHolders: (institutionOwnership?.ownershipList ?? [])
+          .slice(0, 10)
+          .map(mapHolder),
+        topFundHolders: (fundOwnership?.ownershipList ?? [])
+          .slice(0, 10)
+          .map(mapHolder),
+      };
+    } catch (err) {
+      logger.warn({ err, ticker }, "Failed to fetch Yahoo ownership data");
       return null;
     }
   });

@@ -6,11 +6,22 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from './aiCommitteeVerdict';
+export * from './aiCommitteeVerdictAgentVerdict';
+export * from './aiCommitteeVerdictReasoningBreakdown';
+export * from './aiCommitteeVerdictReasoningBreakdownGrowthStance';
+export * from './aiCommitteeVerdictReasoningBreakdownMacroStance';
+export * from './aiCommitteeVerdictReasoningBreakdownValueStance';
 export * from './dcfValuation';
 export * from './experimentalScores';
 export * from './financialLinks';
+export * from './fundFlow';
+export * from './fundFlowInstitutionalMomentum';
+export * from './fundFlowVolumeShockStatus';
 export * from './guruScores';
 export * from './healthStatus';
+export * from './historicalValuation';
+export * from './historicalValuationPeriods';
 export * from './marketData';
 export * from './newsItem';
 export * from './screenerList';
@@ -20,3 +31,7 @@ export * from './stockDetail';
 export * from './stockSearchResult';
 export * from './tradingSignals';
 export * from './tradingSignalsTrend';
+export * from './valuationBandLevels';
+export * from './valuationChartPoint';
+export * from './valuationPeriodStats';
+export * from './whaleHolder';

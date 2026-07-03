@@ -9,6 +9,8 @@ import {
 import {
   getQuoteSummary,
   getChartHistory,
+  getLongChartHistory,
+  getOwnershipData,
   getNews,
   searchTickers,
 } from "../lib/marketData";
@@ -19,6 +21,9 @@ import {
   computeTradingSignals,
   computeExperimentalScores,
 } from "../lib/quantCalculations";
+import { computeHistoricalValuation } from "../lib/historicalValuation";
+import { computeAiCommitteeVerdict } from "../lib/aiCommittee";
+import { computeFundFlow } from "../lib/fundFlow";
 
 const router: IRouter = Router();
 
@@ -131,6 +136,95 @@ router.get("/stocks/:ticker", async (req, res): Promise<void> => {
 
   req.log.info({ ticker }, "Stock detail served");
   res.json(GetStockDetailResponse.parse(responseBody));
+});
+
+router.get(
+  "/stocks/:ticker/historical-valuation",
+  async (req, res): Promise<void> => {
+    const params = GetStockDetailParams.safeParse(req.params);
+    if (!params.success) {
+      res.status(400).json({ error: params.error.message });
+      return;
+    }
+    const ticker = params.data.ticker.toUpperCase();
+
+    const [quote, longChart] = await Promise.all([
+      getQuoteSummary(ticker),
+      getLongChartHistory(ticker),
+    ]);
+
+    if (!quote || !quote.price?.regularMarketPrice) {
+      res.status(404).json({ error: "Ticker not found" });
+      return;
+    }
+
+    const result = computeHistoricalValuation(ticker, quote, longChart);
+    req.log.info({ ticker }, "Historical valuation served");
+    res.json(result);
+  },
+);
+
+router.get(
+  "/stocks/:ticker/ai-committee",
+  async (req, res): Promise<void> => {
+    const params = GetStockDetailParams.safeParse(req.params);
+    if (!params.success) {
+      res.status(400).json({ error: params.error.message });
+      return;
+    }
+    const ticker = params.data.ticker.toUpperCase();
+
+    const [quote, chart, news] = await Promise.all([
+      getQuoteSummary(ticker),
+      getChartHistory(ticker),
+      getNews(ticker),
+    ]);
+
+    if (!quote || !quote.price?.regularMarketPrice) {
+      res.status(404).json({ error: "Ticker not found" });
+      return;
+    }
+
+    const guruScores = computeGuruScores(quote);
+    const dcfValuation = computeDcfValuation(quote);
+    const tradingSignals = computeTradingSignals(chart?.closes ?? []);
+    const experimentalScores = computeExperimentalScores(ticker, quote);
+
+    const result = computeAiCommitteeVerdict(
+      ticker,
+      quote,
+      guruScores,
+      dcfValuation,
+      tradingSignals,
+      experimentalScores,
+      news,
+    );
+    req.log.info({ ticker }, "AI committee verdict served");
+    res.json(result);
+  },
+);
+
+router.get("/stocks/:ticker/fund-flow", async (req, res): Promise<void> => {
+  const params = GetStockDetailParams.safeParse(req.params);
+  if (!params.success) {
+    res.status(400).json({ error: params.error.message });
+    return;
+  }
+  const ticker = params.data.ticker.toUpperCase();
+
+  const [quote, ownership] = await Promise.all([
+    getQuoteSummary(ticker),
+    getOwnershipData(ticker),
+  ]);
+
+  if (!quote || !quote.price?.regularMarketPrice) {
+    res.status(404).json({ error: "Ticker not found" });
+    return;
+  }
+
+  const result = computeFundFlow(ticker, quote, ownership);
+  req.log.info({ ticker }, "Fund flow served");
+  res.json(result);
 });
 
 export default router;

@@ -139,6 +139,188 @@ export interface StockDetail {
   experimentalScores: ExperimentalScores;
 }
 
+export interface ValuationBandLevels {
+  /** @nullable */
+  minus2SD: number | null;
+  /** @nullable */
+  minus1SD: number | null;
+  /** @nullable */
+  mean: number | null;
+  /** @nullable */
+  plus1SD: number | null;
+  /** @nullable */
+  plus2SD: number | null;
+}
+
+export interface ValuationPeriodStats {
+  years: number;
+  /** @nullable */
+  currentPe: number | null;
+  /** @nullable */
+  pePercentile: number | null;
+  /** @nullable */
+  peMean: number | null;
+  /** @nullable */
+  peStdDev: number | null;
+  priceBandsFromPe: ValuationBandLevels;
+  /** @nullable */
+  currentPb: number | null;
+  /** @nullable */
+  pbPercentile: number | null;
+  /** @nullable */
+  pbMean: number | null;
+  /** @nullable */
+  pbStdDev: number | null;
+  priceBandsFromPb: ValuationBandLevels;
+}
+
+export interface ValuationChartPoint {
+  date: string;
+  price: number;
+  /** @nullable */
+  peBandMinus2SD: number | null;
+  /** @nullable */
+  peBandMinus1SD: number | null;
+  /** @nullable */
+  peBandMean: number | null;
+  /** @nullable */
+  peBandPlus1SD: number | null;
+  /** @nullable */
+  peBandPlus2SD: number | null;
+}
+
+export type HistoricalValuationPeriods = {
+  threeYear: ValuationPeriodStats | null;
+  fiveYear: ValuationPeriodStats | null;
+  tenYear: ValuationPeriodStats | null;
+};
+
+export interface HistoricalValuation {
+  ticker: string;
+  isHeuristic: boolean;
+  methodologyNote: string;
+  /** @nullable */
+  currentPrice: number | null;
+  /** @nullable */
+  currentPe: number | null;
+  /** @nullable */
+  currentPb: number | null;
+  periods: HistoricalValuationPeriods;
+  chartSeries: ValuationChartPoint[];
+}
+
+export type AiCommitteeVerdictAgentVerdict = typeof AiCommitteeVerdictAgentVerdict[keyof typeof AiCommitteeVerdictAgentVerdict];
+
+
+export const AiCommitteeVerdictAgentVerdict = {
+  BUY: 'BUY',
+  HOLD: 'HOLD',
+  SELL: 'SELL',
+} as const;
+
+export type AiCommitteeVerdictReasoningBreakdownValueStance = typeof AiCommitteeVerdictReasoningBreakdownValueStance[keyof typeof AiCommitteeVerdictReasoningBreakdownValueStance];
+
+
+export const AiCommitteeVerdictReasoningBreakdownValueStance = {
+  bullish: 'bullish',
+  bearish: 'bearish',
+  neutral: 'neutral',
+} as const;
+
+export type AiCommitteeVerdictReasoningBreakdownGrowthStance = typeof AiCommitteeVerdictReasoningBreakdownGrowthStance[keyof typeof AiCommitteeVerdictReasoningBreakdownGrowthStance];
+
+
+export const AiCommitteeVerdictReasoningBreakdownGrowthStance = {
+  bullish: 'bullish',
+  bearish: 'bearish',
+  neutral: 'neutral',
+} as const;
+
+export type AiCommitteeVerdictReasoningBreakdownMacroStance = typeof AiCommitteeVerdictReasoningBreakdownMacroStance[keyof typeof AiCommitteeVerdictReasoningBreakdownMacroStance];
+
+
+export const AiCommitteeVerdictReasoningBreakdownMacroStance = {
+  bullish: 'bullish',
+  bearish: 'bearish',
+  neutral: 'neutral',
+} as const;
+
+export type AiCommitteeVerdictReasoningBreakdown = {
+  valueView: string;
+  valueStance: AiCommitteeVerdictReasoningBreakdownValueStance;
+  growthView: string;
+  growthStance: AiCommitteeVerdictReasoningBreakdownGrowthStance;
+  macroView: string;
+  macroStance: AiCommitteeVerdictReasoningBreakdownMacroStance;
+};
+
+export interface AiCommitteeVerdict {
+  ticker: string;
+  isHeuristic: boolean;
+  methodologyNote: string;
+  agentVerdict: AiCommitteeVerdictAgentVerdict;
+  confidence: number;
+  reasoningBreakdown: AiCommitteeVerdictReasoningBreakdown;
+  keyCatalysts: string[];
+  hiddenRisks: string[];
+}
+
+export interface WhaleHolder {
+  organization: string;
+  /** @nullable */
+  pctHeld: number | null;
+  /** @nullable */
+  shares: number | null;
+  /** @nullable */
+  value: number | null;
+  /** @nullable */
+  pctChange: number | null;
+}
+
+export type FundFlowInstitutionalMomentum = typeof FundFlowInstitutionalMomentum[keyof typeof FundFlowInstitutionalMomentum];
+
+
+export const FundFlowInstitutionalMomentum = {
+  increasing: 'increasing',
+  decreasing: 'decreasing',
+  flat: 'flat',
+  unknown: 'unknown',
+} as const;
+
+export type FundFlowVolumeShockStatus = typeof FundFlowVolumeShockStatus[keyof typeof FundFlowVolumeShockStatus];
+
+
+export const FundFlowVolumeShockStatus = {
+  accumulation: 'accumulation',
+  distribution: 'distribution',
+  normal: 'normal',
+} as const;
+
+export interface FundFlow {
+  ticker: string;
+  isHeuristic: boolean;
+  methodologyNote: string;
+  /** @nullable */
+  institutionsPercentHeld: number | null;
+  /** @nullable */
+  institutionsCount: number | null;
+  /** @nullable */
+  insidersPercentHeld: number | null;
+  institutionalMomentum: FundFlowInstitutionalMomentum;
+  institutionalMomentumNote: string;
+  topWhaleHolders: WhaleHolder[];
+  /** @nullable */
+  currentVolume: number | null;
+  /** @nullable */
+  averageVolume: number | null;
+  /** @nullable */
+  volumeRatio: number | null;
+  /** @nullable */
+  priceChangePercent: number | null;
+  volumeShockStatus: FundFlowVolumeShockStatus;
+  volumeShockNote: string;
+}
+
 export interface ScreenerStock {
   symbol: string;
   name: string;

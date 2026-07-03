@@ -124,6 +124,167 @@ export const GetStockDetailResponse = zod.object({
 
 
 /**
+ * @summary Get historical PE/PB valuation bands for a ticker
+ */
+export const GetHistoricalValuationParams = zod.object({
+  "ticker": zod.coerce.string()
+})
+
+export const GetHistoricalValuationResponse = zod.object({
+  "ticker": zod.string(),
+  "isHeuristic": zod.boolean(),
+  "methodologyNote": zod.string(),
+  "currentPrice": zod.number().nullable(),
+  "currentPe": zod.number().nullable(),
+  "currentPb": zod.number().nullable(),
+  "periods": zod.object({
+  "threeYear": zod.union([zod.object({
+  "years": zod.number(),
+  "currentPe": zod.number().nullable(),
+  "pePercentile": zod.number().nullable(),
+  "peMean": zod.number().nullable(),
+  "peStdDev": zod.number().nullable(),
+  "priceBandsFromPe": zod.object({
+  "minus2SD": zod.number().nullable(),
+  "minus1SD": zod.number().nullable(),
+  "mean": zod.number().nullable(),
+  "plus1SD": zod.number().nullable(),
+  "plus2SD": zod.number().nullable()
+}),
+  "currentPb": zod.number().nullable(),
+  "pbPercentile": zod.number().nullable(),
+  "pbMean": zod.number().nullable(),
+  "pbStdDev": zod.number().nullable(),
+  "priceBandsFromPb": zod.object({
+  "minus2SD": zod.number().nullable(),
+  "minus1SD": zod.number().nullable(),
+  "mean": zod.number().nullable(),
+  "plus1SD": zod.number().nullable(),
+  "plus2SD": zod.number().nullable()
+})
+}),zod.null()]),
+  "fiveYear": zod.union([zod.object({
+  "years": zod.number(),
+  "currentPe": zod.number().nullable(),
+  "pePercentile": zod.number().nullable(),
+  "peMean": zod.number().nullable(),
+  "peStdDev": zod.number().nullable(),
+  "priceBandsFromPe": zod.object({
+  "minus2SD": zod.number().nullable(),
+  "minus1SD": zod.number().nullable(),
+  "mean": zod.number().nullable(),
+  "plus1SD": zod.number().nullable(),
+  "plus2SD": zod.number().nullable()
+}),
+  "currentPb": zod.number().nullable(),
+  "pbPercentile": zod.number().nullable(),
+  "pbMean": zod.number().nullable(),
+  "pbStdDev": zod.number().nullable(),
+  "priceBandsFromPb": zod.object({
+  "minus2SD": zod.number().nullable(),
+  "minus1SD": zod.number().nullable(),
+  "mean": zod.number().nullable(),
+  "plus1SD": zod.number().nullable(),
+  "plus2SD": zod.number().nullable()
+})
+}),zod.null()]),
+  "tenYear": zod.union([zod.object({
+  "years": zod.number(),
+  "currentPe": zod.number().nullable(),
+  "pePercentile": zod.number().nullable(),
+  "peMean": zod.number().nullable(),
+  "peStdDev": zod.number().nullable(),
+  "priceBandsFromPe": zod.object({
+  "minus2SD": zod.number().nullable(),
+  "minus1SD": zod.number().nullable(),
+  "mean": zod.number().nullable(),
+  "plus1SD": zod.number().nullable(),
+  "plus2SD": zod.number().nullable()
+}),
+  "currentPb": zod.number().nullable(),
+  "pbPercentile": zod.number().nullable(),
+  "pbMean": zod.number().nullable(),
+  "pbStdDev": zod.number().nullable(),
+  "priceBandsFromPb": zod.object({
+  "minus2SD": zod.number().nullable(),
+  "minus1SD": zod.number().nullable(),
+  "mean": zod.number().nullable(),
+  "plus1SD": zod.number().nullable(),
+  "plus2SD": zod.number().nullable()
+})
+}),zod.null()])
+}),
+  "chartSeries": zod.array(zod.object({
+  "date": zod.string(),
+  "price": zod.number(),
+  "peBandMinus2SD": zod.number().nullable(),
+  "peBandMinus1SD": zod.number().nullable(),
+  "peBandMean": zod.number().nullable(),
+  "peBandPlus1SD": zod.number().nullable(),
+  "peBandPlus2SD": zod.number().nullable()
+}))
+})
+
+
+/**
+ * @summary Get the AI Investment Committee verdict for a ticker
+ */
+export const GetAiCommitteeVerdictParams = zod.object({
+  "ticker": zod.coerce.string()
+})
+
+export const GetAiCommitteeVerdictResponse = zod.object({
+  "ticker": zod.string(),
+  "isHeuristic": zod.boolean(),
+  "methodologyNote": zod.string(),
+  "agentVerdict": zod.enum(['BUY', 'HOLD', 'SELL']),
+  "confidence": zod.number(),
+  "reasoningBreakdown": zod.object({
+  "valueView": zod.string(),
+  "valueStance": zod.enum(['bullish', 'bearish', 'neutral']),
+  "growthView": zod.string(),
+  "growthStance": zod.enum(['bullish', 'bearish', 'neutral']),
+  "macroView": zod.string(),
+  "macroStance": zod.enum(['bullish', 'bearish', 'neutral'])
+}),
+  "keyCatalysts": zod.array(zod.string()),
+  "hiddenRisks": zod.array(zod.string())
+})
+
+
+/**
+ * @summary Get institutional ownership and volume shock data for a ticker
+ */
+export const GetFundFlowParams = zod.object({
+  "ticker": zod.coerce.string()
+})
+
+export const GetFundFlowResponse = zod.object({
+  "ticker": zod.string(),
+  "isHeuristic": zod.boolean(),
+  "methodologyNote": zod.string(),
+  "institutionsPercentHeld": zod.number().nullable(),
+  "institutionsCount": zod.number().nullable(),
+  "insidersPercentHeld": zod.number().nullable(),
+  "institutionalMomentum": zod.enum(['increasing', 'decreasing', 'flat', 'unknown']),
+  "institutionalMomentumNote": zod.string(),
+  "topWhaleHolders": zod.array(zod.object({
+  "organization": zod.string(),
+  "pctHeld": zod.number().nullable(),
+  "shares": zod.number().nullable(),
+  "value": zod.number().nullable(),
+  "pctChange": zod.number().nullable()
+})),
+  "currentVolume": zod.number().nullable(),
+  "averageVolume": zod.number().nullable(),
+  "volumeRatio": zod.number().nullable(),
+  "priceChangePercent": zod.number().nullable(),
+  "volumeShockStatus": zod.enum(['accumulation', 'distribution', 'normal']),
+  "volumeShockNote": zod.string()
+})
+
+
+/**
  * @summary Get the 5 thematic Top 10 stock screener leaderboards
  */
 export const GetScreenersResponseItem = zod.object({

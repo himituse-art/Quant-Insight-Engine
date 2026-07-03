@@ -82,6 +82,66 @@ paths:
                 $ref: "#/components/schemas/StockDetail"
         "404":
           description: Ticker not found
+  /stocks/{ticker}/historical-valuation:
+    get:
+      operationId: getHistoricalValuation
+      tags: [stocks]
+      summary: Get historical PE/PB valuation bands for a ticker
+      parameters:
+        - name: ticker
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Historical valuation bands
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HistoricalValuation"
+        "404":
+          description: Ticker not found
+  /stocks/{ticker}/ai-committee:
+    get:
+      operationId: getAiCommitteeVerdict
+      tags: [stocks]
+      summary: Get the AI Investment Committee verdict for a ticker
+      parameters:
+        - name: ticker
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: AI committee verdict
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AiCommitteeVerdict"
+        "404":
+          description: Ticker not found
+  /stocks/{ticker}/fund-flow:
+    get:
+      operationId: getFundFlow
+      tags: [stocks]
+      summary: Get institutional ownership and volume shock data for a ticker
+      parameters:
+        - name: ticker
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Fund and whale flow data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FundFlow"
+        "404":
+          description: Ticker not found
   /screeners:
     get:
       operationId: getScreeners
@@ -268,6 +328,194 @@ components:
             $ref: "#/components/schemas/NewsItem"
         financialLinks: { $ref: "#/components/schemas/FinancialLinks" }
         experimentalScores: { $ref: "#/components/schemas/ExperimentalScores" }
+    ValuationBandLevels:
+      type: object
+      required: [minus2SD, minus1SD, mean, plus1SD, plus2SD]
+      properties:
+        minus2SD: { type: ["number", "null"] }
+        minus1SD: { type: ["number", "null"] }
+        mean: { type: ["number", "null"] }
+        plus1SD: { type: ["number", "null"] }
+        plus2SD: { type: ["number", "null"] }
+    ValuationPeriodStats:
+      type: object
+      required:
+        - years
+        - currentPe
+        - pePercentile
+        - peMean
+        - peStdDev
+        - priceBandsFromPe
+        - currentPb
+        - pbPercentile
+        - pbMean
+        - pbStdDev
+        - priceBandsFromPb
+      properties:
+        years: { type: number }
+        currentPe: { type: ["number", "null"] }
+        pePercentile: { type: ["number", "null"] }
+        peMean: { type: ["number", "null"] }
+        peStdDev: { type: ["number", "null"] }
+        priceBandsFromPe: { $ref: "#/components/schemas/ValuationBandLevels" }
+        currentPb: { type: ["number", "null"] }
+        pbPercentile: { type: ["number", "null"] }
+        pbMean: { type: ["number", "null"] }
+        pbStdDev: { type: ["number", "null"] }
+        priceBandsFromPb: { $ref: "#/components/schemas/ValuationBandLevels" }
+    ValuationChartPoint:
+      type: object
+      required:
+        - date
+        - price
+        - peBandMinus2SD
+        - peBandMinus1SD
+        - peBandMean
+        - peBandPlus1SD
+        - peBandPlus2SD
+      properties:
+        date: { type: string }
+        price: { type: number }
+        peBandMinus2SD: { type: ["number", "null"] }
+        peBandMinus1SD: { type: ["number", "null"] }
+        peBandMean: { type: ["number", "null"] }
+        peBandPlus1SD: { type: ["number", "null"] }
+        peBandPlus2SD: { type: ["number", "null"] }
+    HistoricalValuation:
+      type: object
+      required:
+        - ticker
+        - isHeuristic
+        - methodologyNote
+        - currentPrice
+        - currentPe
+        - currentPb
+        - periods
+        - chartSeries
+      properties:
+        ticker: { type: string }
+        isHeuristic: { type: boolean }
+        methodologyNote: { type: string }
+        currentPrice: { type: ["number", "null"] }
+        currentPe: { type: ["number", "null"] }
+        currentPb: { type: ["number", "null"] }
+        periods:
+          type: object
+          required: [threeYear, fiveYear, tenYear]
+          properties:
+            threeYear:
+              oneOf:
+                - $ref: "#/components/schemas/ValuationPeriodStats"
+                - type: "null"
+            fiveYear:
+              oneOf:
+                - $ref: "#/components/schemas/ValuationPeriodStats"
+                - type: "null"
+            tenYear:
+              oneOf:
+                - $ref: "#/components/schemas/ValuationPeriodStats"
+                - type: "null"
+        chartSeries:
+          type: array
+          items:
+            $ref: "#/components/schemas/ValuationChartPoint"
+    AiCommitteeVerdict:
+      type: object
+      required:
+        - ticker
+        - isHeuristic
+        - methodologyNote
+        - agentVerdict
+        - confidence
+        - reasoningBreakdown
+        - keyCatalysts
+        - hiddenRisks
+      properties:
+        ticker: { type: string }
+        isHeuristic: { type: boolean }
+        methodologyNote: { type: string }
+        agentVerdict:
+          type: string
+          enum: [BUY, HOLD, SELL]
+        confidence: { type: number }
+        reasoningBreakdown:
+          type: object
+          required:
+            - valueView
+            - valueStance
+            - growthView
+            - growthStance
+            - macroView
+            - macroStance
+          properties:
+            valueView: { type: string }
+            valueStance:
+              type: string
+              enum: [bullish, bearish, neutral]
+            growthView: { type: string }
+            growthStance:
+              type: string
+              enum: [bullish, bearish, neutral]
+            macroView: { type: string }
+            macroStance:
+              type: string
+              enum: [bullish, bearish, neutral]
+        keyCatalysts:
+          type: array
+          items: { type: string }
+        hiddenRisks:
+          type: array
+          items: { type: string }
+    WhaleHolder:
+      type: object
+      required: [organization, pctHeld, shares, value, pctChange]
+      properties:
+        organization: { type: string }
+        pctHeld: { type: ["number", "null"] }
+        shares: { type: ["number", "null"] }
+        value: { type: ["number", "null"] }
+        pctChange: { type: ["number", "null"] }
+    FundFlow:
+      type: object
+      required:
+        - ticker
+        - isHeuristic
+        - methodologyNote
+        - institutionsPercentHeld
+        - institutionsCount
+        - insidersPercentHeld
+        - institutionalMomentum
+        - institutionalMomentumNote
+        - topWhaleHolders
+        - currentVolume
+        - averageVolume
+        - volumeRatio
+        - priceChangePercent
+        - volumeShockStatus
+        - volumeShockNote
+      properties:
+        ticker: { type: string }
+        isHeuristic: { type: boolean }
+        methodologyNote: { type: string }
+        institutionsPercentHeld: { type: ["number", "null"] }
+        institutionsCount: { type: ["number", "null"] }
+        insidersPercentHeld: { type: ["number", "null"] }
+        institutionalMomentum:
+          type: string
+          enum: [increasing, decreasing, flat, unknown]
+        institutionalMomentumNote: { type: string }
+        topWhaleHolders:
+          type: array
+          items:
+            $ref: "#/components/schemas/WhaleHolder"
+        currentVolume: { type: ["number", "null"] }
+        averageVolume: { type: ["number", "null"] }
+        volumeRatio: { type: ["number", "null"] }
+        priceChangePercent: { type: ["number", "null"] }
+        volumeShockStatus:
+          type: string
+          enum: [accumulation, distribution, normal]
+        volumeShockNote: { type: string }
     ScreenerStock:
       type: object
       required: [symbol, name, price, metricLabel, metricValue, rank]
