@@ -10,6 +10,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: stocks
+    description: Stock quant data operations
 paths:
   /healthz:
     get:
@@ -24,6 +26,60 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /stocks/search:
+    get:
+      operationId: searchStocks
+      tags: [stocks]
+      summary: Search for stock tickers
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Matching tickers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/StockSearchResult"
+  /stocks/popular:
+    get:
+      operationId: getPopularStocks
+      tags: [stocks]
+      summary: List a curated set of popular tickers
+      responses:
+        "200":
+          description: Popular tickers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/StockSearchResult"
+  /stocks/{ticker}:
+    get:
+      operationId: getStockDetail
+      tags: [stocks]
+      summary: Get full quant detail for a ticker
+      parameters:
+        - name: ticker
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Stock detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StockDetail"
+        "404":
+          description: Ticker not found
 components:
   schemas:
     HealthStatus:
@@ -33,4 +89,167 @@ components:
           type: string
       required:
         - status
+    StockSearchResult:
+      type: object
+      required: [symbol, name]
+      properties:
+        symbol:
+          type: string
+        name:
+          type: string
+        exchange:
+          type: ["string", "null"]
+    MarketData:
+      type: object
+      required:
+        - price
+        - change
+        - changePercent
+        - marketCap
+        - peRatio
+        - forwardPe
+        - pegRatio
+        - epsTtm
+        - roe
+        - freeCashFlow
+        - grossMargin
+        - currency
+        - lastUpdated
+      properties:
+        price: { type: ["number", "null"] }
+        change: { type: ["number", "null"] }
+        changePercent: { type: ["number", "null"] }
+        marketCap: { type: ["number", "null"] }
+        peRatio: { type: ["number", "null"] }
+        forwardPe: { type: ["number", "null"] }
+        pegRatio: { type: ["number", "null"] }
+        epsTtm: { type: ["number", "null"] }
+        roe: { type: ["number", "null"] }
+        freeCashFlow: { type: ["number", "null"] }
+        grossMargin: { type: ["number", "null"] }
+        currency: { type: string }
+        lastUpdated: { type: string, format: date-time }
+    GuruScores:
+      type: object
+      required:
+        - buffettScore
+        - buffettSummary
+        - lynchScore
+        - lynchSummary
+        - mungerScore
+        - mungerSummary
+      properties:
+        buffettScore: { type: number }
+        buffettSummary: { type: string }
+        lynchScore: { type: number }
+        lynchSummary: { type: string }
+        mungerScore: { type: number }
+        mungerSummary: { type: string }
+    DcfValuation:
+      type: object
+      required:
+        - fairValue
+        - currentPrice
+        - marginOfSafetyPercent
+        - expectedReturn1Y
+        - expectedReturn3Y
+        - expectedReturn5Y
+        - assumedGrowthRate
+        - discountRate
+        - terminalGrowthRate
+      properties:
+        fairValue: { type: ["number", "null"] }
+        currentPrice: { type: ["number", "null"] }
+        marginOfSafetyPercent: { type: ["number", "null"] }
+        expectedReturn1Y: { type: ["number", "null"] }
+        expectedReturn3Y: { type: ["number", "null"] }
+        expectedReturn5Y: { type: ["number", "null"] }
+        assumedGrowthRate: { type: ["number", "null"] }
+        discountRate: { type: number }
+        terminalGrowthRate: { type: number }
+    TradingSignals:
+      type: object
+      required:
+        - suggestedBuyPrice
+        - stopLoss
+        - targetPrice1
+        - targetPrice2
+        - rsi14
+        - sma50
+        - sma200
+        - trend
+      properties:
+        suggestedBuyPrice: { type: ["number", "null"] }
+        stopLoss: { type: ["number", "null"] }
+        targetPrice1: { type: ["number", "null"] }
+        targetPrice2: { type: ["number", "null"] }
+        rsi14: { type: ["number", "null"] }
+        sma50: { type: ["number", "null"] }
+        sma200: { type: ["number", "null"] }
+        trend:
+          type: string
+          enum: [bullish, bearish, neutral]
+    NewsItem:
+      type: object
+      required: [title, link, publisher, publishedAt]
+      properties:
+        title: { type: string }
+        link: { type: string }
+        publisher: { type: string }
+        publishedAt: { type: string, format: date-time }
+    FinancialLinks:
+      type: object
+      required: [incomeStatementUrl, balanceSheetUrl, cashFlowUrl, secFilingsUrl]
+      properties:
+        incomeStatementUrl: { type: string }
+        balanceSheetUrl: { type: string }
+        cashFlowUrl: { type: string }
+        secFilingsUrl: { type: string }
+    ExperimentalScores:
+      type: object
+      required:
+        - aiBenefitScore
+        - aiBenefitSummary
+        - sorosScore
+        - sorosSummary
+        - dalioScore
+        - dalioSummary
+        - eps2027Estimate
+      properties:
+        aiBenefitScore: { type: number }
+        aiBenefitSummary: { type: string }
+        sorosScore: { type: number }
+        sorosSummary: { type: string }
+        dalioScore: { type: number }
+        dalioSummary: { type: string }
+        eps2027Estimate: { type: ["number", "null"] }
+    StockDetail:
+      type: object
+      required:
+        - ticker
+        - companyName
+        - sector
+        - industry
+        - marketData
+        - guruScores
+        - dcfValuation
+        - tradingSignals
+        - news
+        - financialLinks
+        - experimentalScores
+      properties:
+        ticker: { type: string }
+        companyName: { type: string }
+        sector: { type: ["string", "null"] }
+        industry: { type: ["string", "null"] }
+        marketData: { $ref: "#/components/schemas/MarketData" }
+        guruScores: { $ref: "#/components/schemas/GuruScores" }
+        dcfValuation: { $ref: "#/components/schemas/DcfValuation" }
+        tradingSignals: { $ref: "#/components/schemas/TradingSignals" }
+        news:
+          type: array
+          items:
+            $ref: "#/components/schemas/NewsItem"
+        financialLinks: { $ref: "#/components/schemas/FinancialLinks" }
+        experimentalScores: { $ref: "#/components/schemas/ExperimentalScores" }
 

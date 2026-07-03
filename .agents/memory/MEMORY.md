@@ -1,0 +1,1 @@
+- [Yahoo Finance API crumb auth](yahoo-finance-crumb-auth.md) — quoteSummary endpoint needs a session cookie + crumb token, not just a User-Agent header.
