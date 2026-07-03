@@ -1,0 +1,21 @@
+Please expand our US Stock Quant Screener platform by adding 3 advanced modules to the FastAPI backend and React frontend: 1) Historical Valuation, 2) AI Agent Inference, and 3) Fund & Whales Flow. Implement them based on the following specifications:
+
+1. Historical Valuation Module:
+- Backend: Calculate historical PE (Price-to-Earnings) and PB (Price-to-Book) Percentiles over the past 3, 5, and 10 years using yfinance historical data. Implement an algorithm to generate "Valuation Bands" (often called PE/PB River Charts) based on standard deviations from the historical mean.
+- Output: Export JSON data containing current valuation metrics compared to historical mean, -1SD, -2SD, +1SD, and +2SD.
+- Frontend: Display an interactive multi-line chart (using Recharts) showing the historical stock price moving along with these 5 historical valuation bands to visualize if a stock is overvalued or undervalued relative to its own history.
+
+2. AI Agent Inference Engine:
+- Backend: Build an intelligent multi-agent inference routing logic. This AI agent should pull quantitative data (Financial ratios, DCF value, Guru scores) and qualitative texts (Latest news, Earnings call summaries).
+- Inference Prompting: Program the AI Agent to act as a Consensus Investment Committee. It must process the quantitative metrics through 3 personas: "The Value Investor (Buffett/Munger style)", "The Growth Hacker (Peter Lynch style)", and "The Macro Strategist (Dalio style)". 
+- Output: The AI Agent must cross-reference these styles, perform logical inference on risks/catalysts, and output a structured JSON: { "agent_verdict": "BUY/HOLD/SELL", "reasoning_breakdown": { "value_view": "...", "growth_view": "...", "macro_view": "..." }, "key_catalysts": ["..."], "hidden_risks": ["..."] }.
+
+3. Fund & Whales Flow Tracking (Smart Money Moving):
+- Backend: Since real-time order logs require premium feeds, implement an algorithm utilizing yfinance's institutional holders (`Ticker.institutional_holders`) and mutual fund holders data to compute "Institutional Momentum". 
+- Volume Shock Analytics: Monitor recent trading volume shocks. If the current day's volume is > 1.5x the 20-day average volume while the price is increasing, tag it as "Institutional Accumulation" (Whales Buying). If the volume shocks while the price is decreasing, tag it as "Institutional Distribution" (Whales Selling).
+- Output: Return institutional ownership change %, top whale holders, and current Volume Shock Status (Accumulation/Distribution/Normal).
+
+Frontend Integration Requirements:
+- Update the Stock Detail Page to include 3 new tabs: [Historical Valuation], [AI Committee Inference], and [Smart Money Flow].
+- In [AI Committee Inference], design a clean, terminal-like text container displaying the reasoning breakdown from different investor personas with visual indicators (e.g., green for bullish, red for bearish).
+- In [Smart Money Flow], show a custom indicator dashboard indicating Whale Accumulation/Distribution status with a progress bar of institutional ownership.
