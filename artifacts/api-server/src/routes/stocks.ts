@@ -11,6 +11,7 @@ import {
   getChartHistory,
   getLongChartHistory,
   getOwnershipData,
+  getOhlcvHistory,
   getNews,
   searchTickers,
 } from "../lib/marketData";
@@ -212,8 +213,9 @@ router.get("/stocks/:ticker/fund-flow", async (req, res): Promise<void> => {
   }
   const ticker = params.data.ticker.toUpperCase();
 
-  const [quote, ownership] = await Promise.all([
+  const [quote, ohlcv, ownership] = await Promise.all([
     getQuoteSummary(ticker),
+    getOhlcvHistory(ticker),
     getOwnershipData(ticker),
   ]);
 
@@ -222,7 +224,7 @@ router.get("/stocks/:ticker/fund-flow", async (req, res): Promise<void> => {
     return;
   }
 
-  const result = computeFundFlow(ticker, quote, ownership);
+  const result = computeFundFlow(ticker, ohlcv, ownership);
   req.log.info({ ticker }, "Fund flow served");
   res.json(result);
 });

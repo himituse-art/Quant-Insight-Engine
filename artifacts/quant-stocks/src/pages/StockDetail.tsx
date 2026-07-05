@@ -118,7 +118,7 @@ export default function StockDetail() {
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="valuation">Historical Valuation</TabsTrigger>
           <TabsTrigger value="ai-committee">AI Committee</TabsTrigger>
-          <TabsTrigger value="fund-flow">Fund &amp; Whales Flow</TabsTrigger>
+          <TabsTrigger value="fund-flow">Smart Money Flow</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview">

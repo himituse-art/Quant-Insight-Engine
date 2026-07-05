@@ -309,6 +309,76 @@ const longChartCache = new Map<
   { expiresAt: number; value: ChartResult }
 >();
 
+export interface OhlcvResult {
+  timestamps: number[];
+  opens: number[];
+  closes: number[];
+  volumes: number[];
+}
+
+const OHLCV_CACHE_TTL_MS = 15 * 60_000;
+const ohlcvCache = new Map<string, { expiresAt: number; value: OhlcvResult }>();
+
+export async function getOhlcvHistory(
+  ticker: string,
+): Promise<OhlcvResult | null> {
+  const hit = ohlcvCache.get(ticker);
+  if (hit && hit.expiresAt > Date.now()) {
+    return hit.value;
+  }
+  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(
+    ticker,
+  )}?range=6mo&interval=1d`;
+  try {
+    const json = (await fetchJson(url)) as {
+      chart?: { result?: unknown[]; error?: unknown };
+    };
+    const result = json.chart?.result?.[0] as
+      | {
+          timestamp?: number[];
+          indicators?: {
+            quote?: {
+              open?: (number | null)[];
+              close?: (number | null)[];
+              volume?: (number | null)[];
+            }[];
+          };
+        }
+      | undefined;
+    if (!result?.timestamp) return null;
+
+    const q = result.indicators?.quote?.[0];
+    const opensRaw = q?.open ?? [];
+    const closesRaw = q?.close ?? [];
+    const volumesRaw = q?.volume ?? [];
+    const timestamps: number[] = [];
+    const opens: number[] = [];
+    const closes: number[] = [];
+    const volumes: number[] = [];
+    for (let i = 0; i < result.timestamp.length; i++) {
+      const o = opensRaw[i];
+      const c = closesRaw[i];
+      const v = volumesRaw[i];
+      if (typeof o === "number" && typeof c === "number" && typeof v === "number") {
+        timestamps.push(result.timestamp[i]);
+        opens.push(o);
+        closes.push(c);
+        volumes.push(v);
+      }
+    }
+    if (closes.length === 0) return null;
+    const value = { timestamps, opens, closes, volumes };
+    ohlcvCache.set(ticker, {
+      expiresAt: Date.now() + OHLCV_CACHE_TTL_MS,
+      value,
+    });
+    return value;
+  } catch (err) {
+    logger.warn({ err, ticker }, "Failed to fetch Yahoo OHLCV history");
+    return null;
+  }
+}
+
 export interface OwnershipHolder {
   organization: string;
   pctHeld?: number;

@@ -475,6 +475,16 @@ components:
         shares: { type: ["number", "null"] }
         value: { type: ["number", "null"] }
         pctChange: { type: ["number", "null"] }
+    CapitalFlowPoint:
+      type: object
+      required: [date, netDollarFlow, whaleAlert, close]
+      properties:
+        date: { type: string }
+        netDollarFlow: { type: number }
+        whaleAlert:
+          type: string
+          enum: [MEGA_INFLOW, MEGA_OUTFLOW, NORMAL]
+        close: { type: number }
     FundFlow:
       type: object
       required:
@@ -484,15 +494,9 @@ components:
         - institutionsPercentHeld
         - institutionsCount
         - insidersPercentHeld
-        - institutionalMomentum
-        - institutionalMomentumNote
+        - top3WhaleConcentrationPercent
         - topWhaleHolders
-        - currentVolume
-        - averageVolume
-        - volumeRatio
-        - priceChangePercent
-        - volumeShockStatus
-        - volumeShockNote
+        - timeSeries
       properties:
         ticker: { type: string }
         isHeuristic: { type: boolean }
@@ -500,22 +504,15 @@ components:
         institutionsPercentHeld: { type: ["number", "null"] }
         institutionsCount: { type: ["number", "null"] }
         insidersPercentHeld: { type: ["number", "null"] }
-        institutionalMomentum:
-          type: string
-          enum: [increasing, decreasing, flat, unknown]
-        institutionalMomentumNote: { type: string }
+        top3WhaleConcentrationPercent: { type: ["number", "null"] }
         topWhaleHolders:
           type: array
           items:
             $ref: "#/components/schemas/WhaleHolder"
-        currentVolume: { type: ["number", "null"] }
-        averageVolume: { type: ["number", "null"] }
-        volumeRatio: { type: ["number", "null"] }
-        priceChangePercent: { type: ["number", "null"] }
-        volumeShockStatus:
-          type: string
-          enum: [accumulation, distribution, normal]
-        volumeShockNote: { type: string }
+        timeSeries:
+          type: array
+          items:
+            $ref: "#/components/schemas/CapitalFlowPoint"
     ScreenerStock:
       type: object
       required: [symbol, name, price, metricLabel, metricValue, rank]

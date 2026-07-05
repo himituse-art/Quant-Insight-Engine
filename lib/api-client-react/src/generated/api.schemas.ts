@@ -277,24 +277,21 @@ export interface WhaleHolder {
   pctChange: number | null;
 }
 
-export type FundFlowInstitutionalMomentum = typeof FundFlowInstitutionalMomentum[keyof typeof FundFlowInstitutionalMomentum];
+export type CapitalFlowPointWhaleAlert = typeof CapitalFlowPointWhaleAlert[keyof typeof CapitalFlowPointWhaleAlert];
 
 
-export const FundFlowInstitutionalMomentum = {
-  increasing: 'increasing',
-  decreasing: 'decreasing',
-  flat: 'flat',
-  unknown: 'unknown',
+export const CapitalFlowPointWhaleAlert = {
+  MEGA_INFLOW: 'MEGA_INFLOW',
+  MEGA_OUTFLOW: 'MEGA_OUTFLOW',
+  NORMAL: 'NORMAL',
 } as const;
 
-export type FundFlowVolumeShockStatus = typeof FundFlowVolumeShockStatus[keyof typeof FundFlowVolumeShockStatus];
-
-
-export const FundFlowVolumeShockStatus = {
-  accumulation: 'accumulation',
-  distribution: 'distribution',
-  normal: 'normal',
-} as const;
+export interface CapitalFlowPoint {
+  date: string;
+  netDollarFlow: number;
+  whaleAlert: CapitalFlowPointWhaleAlert;
+  close: number;
+}
 
 export interface FundFlow {
   ticker: string;
@@ -306,19 +303,10 @@ export interface FundFlow {
   institutionsCount: number | null;
   /** @nullable */
   insidersPercentHeld: number | null;
-  institutionalMomentum: FundFlowInstitutionalMomentum;
-  institutionalMomentumNote: string;
+  /** @nullable */
+  top3WhaleConcentrationPercent: number | null;
   topWhaleHolders: WhaleHolder[];
-  /** @nullable */
-  currentVolume: number | null;
-  /** @nullable */
-  averageVolume: number | null;
-  /** @nullable */
-  volumeRatio: number | null;
-  /** @nullable */
-  priceChangePercent: number | null;
-  volumeShockStatus: FundFlowVolumeShockStatus;
-  volumeShockNote: string;
+  timeSeries: CapitalFlowPoint[];
 }
 
 export interface ScreenerStock {

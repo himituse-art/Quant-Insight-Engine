@@ -266,8 +266,7 @@ export const GetFundFlowResponse = zod.object({
   "institutionsPercentHeld": zod.number().nullable(),
   "institutionsCount": zod.number().nullable(),
   "insidersPercentHeld": zod.number().nullable(),
-  "institutionalMomentum": zod.enum(['increasing', 'decreasing', 'flat', 'unknown']),
-  "institutionalMomentumNote": zod.string(),
+  "top3WhaleConcentrationPercent": zod.number().nullable(),
   "topWhaleHolders": zod.array(zod.object({
   "organization": zod.string(),
   "pctHeld": zod.number().nullable(),
@@ -275,12 +274,12 @@ export const GetFundFlowResponse = zod.object({
   "value": zod.number().nullable(),
   "pctChange": zod.number().nullable()
 })),
-  "currentVolume": zod.number().nullable(),
-  "averageVolume": zod.number().nullable(),
-  "volumeRatio": zod.number().nullable(),
-  "priceChangePercent": zod.number().nullable(),
-  "volumeShockStatus": zod.enum(['accumulation', 'distribution', 'normal']),
-  "volumeShockNote": zod.string()
+  "timeSeries": zod.array(zod.object({
+  "date": zod.string(),
+  "netDollarFlow": zod.number(),
+  "whaleAlert": zod.enum(['MEGA_INFLOW', 'MEGA_OUTFLOW', 'NORMAL']),
+  "close": zod.number()
+}))
 })
 
 

@@ -5,8 +5,7 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
-import type { FundFlowInstitutionalMomentum } from './fundFlowInstitutionalMomentum';
-import type { FundFlowVolumeShockStatus } from './fundFlowVolumeShockStatus';
+import type { CapitalFlowPoint } from './capitalFlowPoint';
 import type { WhaleHolder } from './whaleHolder';
 
 export interface FundFlow {
@@ -19,17 +18,8 @@ export interface FundFlow {
   institutionsCount: number | null;
   /** @nullable */
   insidersPercentHeld: number | null;
-  institutionalMomentum: FundFlowInstitutionalMomentum;
-  institutionalMomentumNote: string;
+  /** @nullable */
+  top3WhaleConcentrationPercent: number | null;
   topWhaleHolders: WhaleHolder[];
-  /** @nullable */
-  currentVolume: number | null;
-  /** @nullable */
-  averageVolume: number | null;
-  /** @nullable */
-  volumeRatio: number | null;
-  /** @nullable */
-  priceChangePercent: number | null;
-  volumeShockStatus: FundFlowVolumeShockStatus;
-  volumeShockNote: string;
+  timeSeries: CapitalFlowPoint[];
 }
