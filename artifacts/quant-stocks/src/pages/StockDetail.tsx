@@ -21,8 +21,12 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { formatCurrency, formatNumber, formatPercent, formatLargeCurrency } from "@/lib/formatters";
 import { cn } from "@/lib/utils";
+import HistoricalValuationTab from "@/components/HistoricalValuationTab";
+import AiCommitteeTab from "@/components/AiCommitteeTab";
+import FundFlowTab from "@/components/FundFlowTab";
 
 // Helper for generic number formatting
 const valOrDash = (val: number | null | undefined, formatter: (v: number) => string) => {
@@ -108,6 +112,16 @@ export default function StockDetail() {
         </div>
       </header>
 
+      {/* Tabs */}
+      <Tabs defaultValue="overview" className="w-full">
+        <TabsList>
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="valuation">Historical Valuation</TabsTrigger>
+          <TabsTrigger value="ai-committee">AI Committee</TabsTrigger>
+          <TabsTrigger value="fund-flow">Fund &amp; Whales Flow</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="overview">
       {/* Layout Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
@@ -383,6 +397,20 @@ export default function StockDetail() {
 
         </div>
       </div>
+        </TabsContent>
+
+        <TabsContent value="valuation">
+          <HistoricalValuationTab ticker={stock.ticker} />
+        </TabsContent>
+
+        <TabsContent value="ai-committee">
+          <AiCommitteeTab ticker={stock.ticker} />
+        </TabsContent>
+
+        <TabsContent value="fund-flow">
+          <FundFlowTab ticker={stock.ticker} />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
